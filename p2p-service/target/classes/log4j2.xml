@@ -1,0 +1,55 @@
+<configuration status="warn" packages="com.wish.plat.util.tracer">
+    <properties>
+
+        <!--${sys:catalina.home}表示linux中环境变量中的tomcat根目录 -->
+        <Property name="log.level.console">info</Property>
+        <Property name="log.path">/var/k8s/logs</Property>
+        <Property name="project.name">plat-peer2peer</Property>
+        <Property name="log.pattern">[%-5p]|@|[%X{SOFA-TraceId}]|@|[%X{SOFA-SpanId}]|@|[%d{yyyy-MM-dd HH:mm:ss,SSS}]|@|[%c]|@|[%commonMsg]|@|%m|@|%n</Property>
+    </properties>
+    <appenders>
+        <console name="Console" target="SYSTEM_OUT">
+            <PatternLayout charset="UTF-8"
+                           pattern="${log.pattern}"/>
+        </console>
+        <Routing name="RoutingAppender">
+            <Routes pattern="$${date:yyyy-MM-dd}-$${log.path}-$${project.name}">
+                <Route>
+                    <RollingFile name="${date:yyyy-MM-dd}-${log.path}-${project.name}"
+                                 fileName="${log.path}/${project.name}/${date:yyyy-MM-dd}/${project.name}.log"
+                                 filePattern="${log.path}/${project.name}/%d{yyyy-MM-dd}/${project.name}-%d{yyyy-MM-dd}-%i.log">
+                        <Filters>
+                            <!--打印最低级别,例如这里只打印INFO以上的日志-->
+                            <ThresholdFilter level="INFO"/>
+                            <!--日志匹配规则,当日志级别为WARN以上时,不打印-->
+                            <!--<ThresholdFilter level="WARN" onMatch="DENY"-->
+                            <!--onMismatch="NEUTRAL"/>-->
+                        </Filters>
+                        <PatternLayout charset="UTF-8"
+                                       pattern="${log.pattern}"/>
+                        <!-- 限制单个文件大小 -->
+                        <SizeBasedTriggeringPolicy size="50 MB"/>
+                        <!-- 限制每天文件个数 -->
+                        <DefaultRolloverStrategy compressionLevel="0" max="1000"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+    </appenders>
+
+    <loggers>
+        <!--过滤掉spring和hibernate的一些无用的debug信息 -->
+        <root level="info">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="RoutingAppender"/>
+        </root>
+
+        <!--<logger name="com.hxyd" level="info" additivity="false">-->
+        <!--<appender-ref ref="Console"/>-->
+        <!--<appender-ref ref="RoutingAppender"/>-->
+        <!--&lt;!&ndash; 输出日志到mongodb &ndash;&gt;-->
+        <!--</logger>-->
+
+    </loggers>
+
+</configuration>

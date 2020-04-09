@@ -1,0 +1,5 @@
+# AutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.wish.plat.p2p.rpc.GetTokenService,\
+com.wish.plat.p2p.rpc.QueryMsgService,\
+com.wish.plat.p2p.rpc.ReceiveMsgService
